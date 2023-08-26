@@ -10,7 +10,7 @@
 
 ?>
 
-<?php if($login) :
+<?php
         if($currentCity) :
     ?>
         <h1>Your city <?= $currentCity['name']; ?>?</h1>
@@ -30,15 +30,3 @@
         <?php endforeach; ?>
     </ul>
     <?php endif; ?>
-
-
-<?php
-        else : ?>
-
-    <div class="py-3 text-center">
-        <h1>Please login</h1>
-        <a href="/web/user/login" class="btn btn-success">Go login</a>
-    </div>
-
-
-<?php endif; ?>

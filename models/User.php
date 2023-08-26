@@ -45,7 +45,8 @@ class User extends ActiveRecord
             ['email', 'email'],
             ['phone', 'string'],
             ['fio', 'string'],
-            ['date_create', 'string']
+            ['date_create', 'string'],
+            ['verifyCode', 'captcha']
         ];
     }
 

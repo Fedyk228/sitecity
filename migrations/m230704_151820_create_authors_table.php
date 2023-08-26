@@ -22,6 +22,7 @@ class m230704_151820_create_authors_table extends Migration
             'auth_key' => $this->string(),
             'token_activate' => $this->string(),
             'is_active' => $this->boolean(),
+            'verifyCode' => $this->string()
         ]);
 
     }
