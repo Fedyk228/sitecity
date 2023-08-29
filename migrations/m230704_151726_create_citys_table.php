@@ -13,7 +13,7 @@ class m230704_151726_create_citys_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%citys}}', [
-            'id' => $this->primaryKey(),
+            'cid' => $this->primaryKey(),
             'name' => $this->string(),
             'date_create' => $this->string()
         ]);

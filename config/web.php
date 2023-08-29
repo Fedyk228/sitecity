@@ -50,6 +50,7 @@ $config = [
                 'user/city-edit/<id:\d+>' => 'user/city-edit',
                 'user/review-edit/<id:\d+>' => 'user/review-edit',
                 'site/city/<id:\d+>' => 'site/city',
+                'site/author/<id:\d+>' => 'site/author',
             ],
         ],
 

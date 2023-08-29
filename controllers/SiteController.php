@@ -66,7 +66,7 @@ class SiteController extends Controller
 
         $exist = UserController::checkLogin();
 
-        $city = City::find()->where(['id' => Yii::$app->request->get('id')])->asArray()->one();
+        $city = City::find()->where(['cid' => Yii::$app->request->get('id')])->asArray()->one();
 
 
 
@@ -75,6 +75,20 @@ class SiteController extends Controller
 
         $reviews = Reviews::find()->select('*')->innerJoin(User::tableName(), Reviews::tableName() . '.id_author = ' . User::tableName() . '.uid')->where(['id_city' => Yii::$app->request->get('id')])->asArray()->all();
 
-        return $this->render('city', ['city' => $city, 'reviews' => $reviews]);
+        return $this->render('city', ['city' => $city, 'reviews' => $reviews, 'login' => $exist]);
+    }
+
+    public function actionAuthor()
+    {
+        $exist = UserController::checkLogin();
+
+        if(!$exist)
+            $this->goBack('/web/user/login');
+
+        $author = User::find()->where(['uid' => Yii::$app->request->get('id')])->asArray()->one();
+
+        $reviews = Reviews::find()->select('*')->leftJoin(City::tableName(), Reviews::tableName() . '.id_city = ' . City::tableName() . '.cid')->where(['id_author' => Yii::$app->request->get('id')])->asArray()->all();
+
+        return $this->render('author', ['author' => $author, 'reviews' => $reviews]);
     }
 }

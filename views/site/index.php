@@ -14,7 +14,7 @@
         if($currentCity) :
     ?>
         <h1>Your city <?= $currentCity['name']; ?>?</h1>
-            <a href="/web/site/city/<?= $currentCity['id'] ?>" class="btn btn-primary">Go reviews</a>
+            <a href="/web/site/city/<?= $currentCity['cid'] ?>" class="btn btn-primary">Go reviews</a>
 
             <hr>
     <h1>or</h1>
@@ -25,7 +25,7 @@
      <ul class="list-group">
          <?php foreach($citys as $city) : ?>
         <li class="list-group-item">
-            <a href="/web/site/city/<?= $city['id'] ?>"><?= $city['name'] ?></a>
+            <a href="/web/site/city/<?= $city['cid'] ?>"><?= $city['name'] ?></a>
         </li>
         <?php endforeach; ?>
     </ul>

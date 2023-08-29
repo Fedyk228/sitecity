@@ -43,8 +43,8 @@ use yii\bootstrap5\ActiveForm;
                 <div>
                     <?php $form=  ActiveForm::begin(); ?>
 
-                    <input type="hidden" name="id" value="<?= $city['id']; ?>">
-                    <a href="/web/user/city-edit/<?= $city['id']; ?>" class="btn btn-success">Edit</a>
+                    <input type="hidden" name="id" value="<?= $city['cid']; ?>">
+                    <a href="/web/user/city-edit/<?= $city['cid']; ?>" class="btn btn-success">Edit</a>
                     <button class="btn btn-danger">Remove</button>
 
                     <?php ActiveForm::end(); ?>

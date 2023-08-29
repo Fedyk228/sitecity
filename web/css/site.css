@@ -34,3 +34,36 @@ header *
     margin: 10px 0;
     object-fit: cover;
 }
+
+.author_btn
+{
+    position: relative;
+    cursor: pointer;
+
+}
+
+.author_btn:hover
+{
+    text-decoration: underline;
+}
+
+.author_info
+{
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 300px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0, .4);
+    display: none;
+}
+
+
+
+
+
+
+
+

@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use yii\web\Controller;
 use app\models\User;
+use app\models\RegisterUser;
 use app\models\City;
 use app\models\Reviews;
 use yii\web\Cookie;
@@ -35,7 +36,7 @@ class UserController extends Controller
 
             if(Yii::$app->request->post('id'))
             {
-                $city = City::find()->where(['id' => Yii::$app->request->post('id')])->one();
+                $city = City::find()->where(['cid' => Yii::$app->request->post('id')])->one();
 
                 if($city->delete())
                     $this->goBack($_SERVER['REQUEST_URI']);
@@ -97,7 +98,7 @@ class UserController extends Controller
 
         foreach($citys as $city)
         {
-            $citysDropdown[$city['id']] = $city['name'];
+            $citysDropdown[$city['cid']] = $city['name'];
         }
 
         return $citysDropdown;
@@ -110,7 +111,7 @@ class UserController extends Controller
         if(!$exist)
             $this->goBack('/web/user/login');
 
-        $model = City::find()->where(['id' => Yii::$app->request->get('id')])->one();
+        $model = City::find()->where(['cid' => Yii::$app->request->get('id')])->one();
         $success = '';
         $err = '';
 
@@ -255,10 +256,18 @@ class UserController extends Controller
     {
         $exist = User::find()->where(['token_activate' => Yii::$app->request->get('t')])->one();
 
+
+
+
         if($exist)
         {
             $exist->is_active = 1;
             $exist->token_activate = '';
+
+//            echo '<pre>';
+//            print_r($exist);
+//            echo '</pre>';
+
 
             if($exist->save())
                 $success = true;
@@ -270,15 +279,15 @@ class UserController extends Controller
 
     public function actionRegister()
     {
-        $model = new User();
+        $model = new RegisterUser();
         $success = '';
         $err = '';
 
         if($model->load(Yii::$app->request->post()))
         {
-            if(Yii::$app->request->post('User')['password'] != Yii::$app->request->post('r_password'))
+            if(Yii::$app->request->post('RegisterUser')['password'] != Yii::$app->request->post('r_password'))
                 $err = 'Repeat password incorrect';
-            else if(!User::find()->where(['email' => Yii::$app->request->post('User')['email']])->one())
+            else if(!RegisterUser::find()->where(['email' => Yii::$app->request->post('RegisterUser')['email']])->one())
             {
                 $model->date_create = Date('d.m.Y - H:i');
                 $model->password = md5($model->password);

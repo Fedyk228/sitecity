@@ -46,11 +46,12 @@ class User extends ActiveRecord
             ['phone', 'string'],
             ['fio', 'string'],
             ['date_create', 'string'],
-            ['verifyCode', 'captcha']
+            ['auth_key', 'string'],
+            ['token_activate', 'string'],
+            ['is_active', 'boolean']
         ];
     }
 
 }
-
 
 
