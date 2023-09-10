@@ -3,13 +3,13 @@
 namespace app\controllers;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use app\models\User;
 use app\models\RegisterUser;
 use app\models\City;
 use app\models\Reviews;
 use yii\web\Cookie;
-
 
 
 class UserController extends Controller
@@ -22,145 +22,102 @@ class UserController extends Controller
         $err = '';
         $exist = self::checkLogin();
 
-        if($exist && isset($exist['role']))
-        {
-            if($model->load(Yii::$app->request->post()))
-            {
-                    $model->date_create = Date('d.m.Y - H:i');
+        if ($exist && isset($exist['role'])) {
 
-                    if($model->save())
-                        $this->goBack($_SERVER['REQUEST_URI']);
-                    else
-                        $err = 'Add city error';
+            switch (CityController::add($exist))
+            {
+                case 'ok': $this->goBack($_SERVER['REQUEST_URI']); break;
+                case 'err': $err = 'Add city error'; break;
             }
 
-            if(Yii::$app->request->post('id'))
+            switch (CityController::delete())
             {
-                $city = City::find()->where(['cid' => Yii::$app->request->post('id')])->one();
-
-                if($city->delete())
-                    $this->goBack($_SERVER['REQUEST_URI']);
-
+                case 'ok': $this->goBack($_SERVER['REQUEST_URI']); break;
+                case 'err': $err = 'Delete city error'; break;
             }
 
-            return $this->render('root', ['model' => $model, 'success' => $success, 'err' => $err, 'citys' => $this->getCitys()]);
-        }
-        else if($exist)
-        {
-            $reviews = Reviews::find()->where(['id_author' => $exist['uid']])->orderBy(['id' => SORT_DESC])->asArray()->all();
 
-            if($modelReviews->load(Yii::$app->request->post()))
+            return $this->render('root',
+                                            [
+                                                'model' => CityController::getModel(),
+                                                'citys' => CityController::getAllCities(),
+                                                'success' => $success,
+                                                'err' => $err
+                                            ]);
+        } else if ($exist) {
+
+            //ADD Review
+            switch (ReviewsController::add($exist))
             {
-                $modelReviews->date_create = Date('d.m.Y - H:i');
-                $modelReviews->id_author = $exist['uid'];
-
-                $filename = '';
-
-                if(!empty($_FILES['Reviews']['name']['img'])) {
-                    $ext = strtolower(array_pop(explode('.', $_FILES['Reviews']['name']['img'])));
-                    $filename = 'file' . time() . '.' . $ext;
-
-                    move_uploaded_file($_FILES['Reviews']['tmp_name']['img'], '../upload/' . $filename);
-                }
-
-                $modelReviews->img = $filename;
-
-                if($modelReviews->save())
-                    $this->goBack($_SERVER['REQUEST_URI']);
-                else
-                    $err = 'Add review error';
+                case 'ok': $this->goBack($_SERVER['REQUEST_URI']); break;
+                case 'err': $err = 'Add review error'; break;
             }
 
-            if(Yii::$app->request->post('id'))
+            //DELETE Review
+            switch (ReviewsController::delete($exist))
             {
-                $review = Reviews::find()->where(['id' => Yii::$app->request->post('id'), 'id_author' => $exist['uid']])->one();
-
-
-                if($review->delete())
-                    $this->goBack($_SERVER['REQUEST_URI']);
+                case 'ok': $this->goBack($_SERVER['REQUEST_URI']); break;
+                case 'err': $err = 'Delete review error'; break;
             }
 
         }
 
 
-
-        return $this->render('index', ['model' => $modelReviews, 'citys' => $this->getCitysDropdown($this->getCitys()), 'reviews' => $reviews, 'success' => $success, 'err' => $err]);
+        return $this->render('index', [
+                                            'model' => ReviewsController::getModel(),
+                                            'citys' => ArrayHelper::map(CityController::getAllCities(), 'cid', 'name'),
+                                            'reviews' => ReviewsController::getUserReviews($exist),
+                                            'success' => $success,
+                                            'err' => $err
+                                            ]);
     }
-
-    public function getCitys()
-    {
-        return City::find()->asArray()->all();
-    }
-
-    public function getCitysDropdown($citys)
-    {
-        $citysDropdown = [];
-
-        foreach($citys as $city)
-        {
-            $citysDropdown[$city['cid']] = $city['name'];
-        }
-
-        return $citysDropdown;
-    }
-
 
     public function actionCityEdit()
     {
         $exist = self::checkLogin();
-        if(!$exist)
+        if (!$exist)
             $this->goBack('/web/user/login');
 
-        $model = City::find()->where(['cid' => Yii::$app->request->get('id')])->one();
+
         $success = '';
         $err = '';
 
-        if($model->load(Yii::$app->request->post()))
+        switch (CityController::edit($exist))
         {
-            if($model->save())
-                $success = 'Save city success';
-            else
-                $err = 'Save city error';
+            case 'ok': $success = 'Save city success'; break;
+            case 'err': $err = 'Save city error'; break;
         }
 
-        return $this->render('city', ['model' => $model, 'citys' => $this->getCitysDropdown($this->getCitys()), 'success' => $success, 'err' => $err]);
+
+        return $this->render('city', [
+                                            'model' => CityController::getCity(),
+                                            'success' => $success,
+                                            'err' => $err
+                            ]);
     }
 
     public function actionReviewEdit()
     {
         $exist = self::checkLogin();
-        if(!$exist)
+        if (!$exist)
             $this->goBack('/web/user/login');
 
-        $model = Reviews::find()->where(['id' => Yii::$app->request->get('id'), 'id_author' => $exist['uid']])->one();
-
-        $filename = $model->img;
         $success = '';
         $err = '';
 
-        if($model->load(Yii::$app->request->post()))
+        switch (ReviewsController::edit($exist))
         {
-            if(!empty($_FILES['Reviews']['name']['img'])) {
-
-                if($filename)
-                    unlink('../upload/' . $filename);
-
-                $ext = strtolower(array_pop(explode('.', $_FILES['Reviews']['name']['img'])));
-                $filename = 'file' . time() . '.' . $ext;
-
-                move_uploaded_file($_FILES['Reviews']['tmp_name']['img'], '../upload/' . $filename);
-            }
-
-            $model->img = $filename;
-
-            if($model->save())
-                $success = 'Save review success';
-            else
-                $err = 'Save review error';
+            case 'ok': $success = 'Save review success'; break;
+            case 'err': $err = 'Save review error'; break;
         }
 
 
-        return $this->render('review-edit', ['model' => $model, 'citys' => $this->getCitysDropdown($this->getCitys()), 'success' => $success, 'err' => $err]);
+        return $this->render('review-edit', [
+                                                    'model' => ReviewsController::getReview($exist),
+                                                    'citys' => ArrayHelper::map(CityController::getAllCities(), 'cid', 'name'),
+                                                    'success' => $success,
+                                                    'err' => $err
+                                                ]);
     }
 
     static public function checkLogin()
@@ -170,7 +127,7 @@ class UserController extends Controller
 
         $root = User::getUser(['auth_key' => $auth_key], 'check_login');
 
-        if($root)
+        if ($root)
             return $root;
 
         return User::find()->where(['auth_key' => $auth_key])->asArray()->one();
@@ -194,42 +151,31 @@ class UserController extends Controller
         $model = new User();
         $err = '';
 
-        if($model->load(Yii::$app->request->post()))
-        {
+        if ($model->load(Yii::$app->request->post())) {
             $email = Yii::$app->request->post('User')['email'];
             $password = Yii::$app->request->post('User')['password'];
 
             $root = User::getUser(['email' => $email, 'password' => $password], 'login');
 
-            if($root)
-            {
+            if ($root) {
                 $this->successLogin($root['auth_key']);
-            }
-            else
-            {
+            } else {
                 $exist = User::find()->where(['email' => $email, 'password' => md5($password)])->one();
 
-                if($exist)
-                {
-                    if($exist['is_active'] == 1)
-                    {
+                if ($exist) {
+                    if ($exist['is_active'] == 1) {
                         $auth_key = md5($email . Date('d.m.H.i.s'));
 
                         $exist->auth_key = $auth_key;
 
-                        if($exist->save())
-                        {
+                        if ($exist->save()) {
                             $this->successLogin($auth_key);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         $err = 'Your account is need activate!';
                     }
 
-                }
-                else
-                {
+                } else {
                     $err = 'Incorrect login or password';
                 }
             }
@@ -257,10 +203,7 @@ class UserController extends Controller
         $exist = User::find()->where(['token_activate' => Yii::$app->request->get('t')])->one();
 
 
-
-
-        if($exist)
-        {
+        if ($exist) {
             $exist->is_active = 1;
             $exist->token_activate = '';
 
@@ -269,7 +212,7 @@ class UserController extends Controller
 //            echo '</pre>';
 
 
-            if($exist->save())
+            if ($exist->save())
                 $success = true;
         }
 
@@ -283,25 +226,21 @@ class UserController extends Controller
         $success = '';
         $err = '';
 
-        if($model->load(Yii::$app->request->post()))
-        {
-            if(Yii::$app->request->post('RegisterUser')['password'] != Yii::$app->request->post('r_password'))
+        if ($model->load(Yii::$app->request->post())) {
+            if (Yii::$app->request->post('RegisterUser')['password'] != Yii::$app->request->post('r_password'))
                 $err = 'Repeat password incorrect';
-            else if(!RegisterUser::find()->where(['email' => Yii::$app->request->post('RegisterUser')['email']])->one())
-            {
+            else if (!RegisterUser::find()->where(['email' => Yii::$app->request->post('RegisterUser')['email']])->one()) {
                 $model->date_create = Date('d.m.Y - H:i');
                 $model->password = md5($model->password);
                 $model->token_activate = md5(time() . $model->email);
 
-                if($model->save())
-                {
+                if ($model->save()) {
                     $model->password = '';
                     $success = 'Register success. Please check your email and activate account';
                     $this->sendMail($model->email, $model->token_activate);
                 }
 
-            }
-            else
+            } else
                 $err = 'This email is already';
         }
 
@@ -314,7 +253,7 @@ class UserController extends Controller
         $from = 'noreply-activate@cs43884.tw1.ru';
 
         $subject = "Activate your account";
-        $subject = "=?utf-8?B?".base64_encode($subject)."?=";
+        $subject = "=?utf-8?B?" . base64_encode($subject) . "?=";
         $headers = "From: $from\r\nReply-to: $from\r\nContent-type: text/html; charset=utf-8\r\n";
 
 

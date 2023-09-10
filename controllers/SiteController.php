@@ -35,15 +35,19 @@ class SiteController extends Controller
         ]));
 
         $citys = City::find()->orderBy(['name' => 'ASC'])->asArray()->all();
+        $currentCity = null;
+
 
         $geo = json_decode(file_get_contents('https://ipwho.is/' . $_SERVER['REMOTE_ADDR']), true);
 
-        foreach ($citys as $city)
+        if($citys != null)
         {
-            if($city['name'] == $geo['city'])
-                $currentCity = $city;
+            foreach ($citys as $city)
+            {
+                if($city['name'] == $geo['city'])
+                    $currentCity = $city;
+            }
         }
-
 
         return $this->render('index', ['login' => UserController::checkLogin(), 'citys' => $citys, 'currentCity' => $currentCity]);
     }

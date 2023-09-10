@@ -5,14 +5,14 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%citys}}`.
  */
-class m230704_151726_create_citys_table extends Migration
+class m230704_151726_create_cities_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%citys}}', [
+        $this->createTable('{{%cities}}', [
             'cid' => $this->primaryKey(),
             'name' => $this->string(),
             'date_create' => $this->string()
@@ -24,6 +24,6 @@ class m230704_151726_create_citys_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%citys}}');
+        $this->dropTable('{{%cities}}');
     }
 }

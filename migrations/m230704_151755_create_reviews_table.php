@@ -22,9 +22,6 @@ class m230704_151755_create_reviews_table extends Migration
             'id_author' => $this->integer(),
             'date_create' => $this->string()
         ]);
-
-        $this->addForeignKey('fk_city_id', 'reviews', 'id_city', 'citys', 'id');
-        $this->addForeignKey('fk_author_id', 'reviews', 'id_author', 'authors', 'id');
     }
 
     /**
@@ -32,9 +29,6 @@ class m230704_151755_create_reviews_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('fk_city_id');
-        $this->dropForeignKey('fk_author_id');
-
         $this->dropTable('{{%reviews}}');
     }
 }

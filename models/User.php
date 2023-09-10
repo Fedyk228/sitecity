@@ -52,6 +52,14 @@ class User extends ActiveRecord
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'fio' => \Yii::t('app', 'Your name'),
+            'email' => \Yii::t('app', 'Your email address'),
+            ];
+    }
+
 }
 
 

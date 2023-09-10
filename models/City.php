@@ -11,7 +11,7 @@ class City extends ActiveRecord
 
     static public function tableName()
     {
-        return 'citys';
+        return 'cities';
     }
 
     public function rules()

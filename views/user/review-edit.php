@@ -47,7 +47,7 @@ use yii\bootstrap5\ActiveForm;
     </div>
 
     <div class="col-md-4">
-        <button class="btn btn-success">Add review</button>
+        <button class="btn btn-success">Save review</button>
     </div>
 </div>
 

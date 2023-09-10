@@ -29,4 +29,6 @@
         </li>
         <?php endforeach; ?>
     </ul>
+    <?php else: ?>
+        <h1 class="text-danger">Cities not found</h1>
     <?php endif; ?>
